@@ -272,3 +272,19 @@ def determine_sound_locations(r_ref, l_ref, node_events, **kwargs):
         )
 
     return location_list
+
+def gauss_kern(size, sizey = None):
+    #returns normalized 2D gauss kernel
+    size = int(size)
+    if not sizey:
+        sizey = size
+    else:
+        sizey = int(sizey)
+    x,y = np.mgrid[-size:size+1, -sizey:sizey+1]
+    g = np.exp(-(x**2/float(size) + y**2/float(sizey)))
+    return g/g.sum()
+
+def blur_image(im, n, ny=None):
+    g = gauss_kern(n, sizey=ny)
+    improc = signal.convolve(im, g, mode='valid')
+    return(improc)

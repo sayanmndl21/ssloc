@@ -47,9 +47,8 @@ class Detect(obj):
 
 
     def __repr__(self):
-        return (
-            "DetectionEvent(x=" + str(self.x) +
-            ", y=" + str(self.y)
+        return ("DetectionEvent(x=" + str(self.x) +
+            ", y=" + str(self.y) +
             ", confidence=" + str(self.confidence) +
             ", spl=" + str(self.spl) + ")"
         )
