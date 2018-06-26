@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+from numpy import *
 import scipy.optimize as opt
 import signal
 from scipy import signal
@@ -51,3 +52,40 @@ ALS_write = open(ALS_name, 'w')
 #### start program #########
 
 sr = record()
+raw_data = sr.getAudio()
+signal_level = round(abs(loudness(raw_data)))
+
+row_num = 0
+time_index = 0
+for t in time_array:
+    if time_array_flag == 1:
+        if t! = t_i:
+            hop_size = f_s*(t-t_last)
+            t_last = t
+        else:
+            t_last = t
+
+    n_t = int(f_s*t)
+    h_hop = int(f_s*hop_size)
+    corr_index_low = zeros(num_mic_pairs)
+    corr_index_high = zeros(num_mic_pairs)
+    prob_grid = zeros((grid_pts,grid_pts))
+
+    initialize_prob = ones((grid_pts,grid_pts))
+
+    grid_hits = zeros((grid_pts, grid_pts))
+
+    if t == t_i or n_hop>=num_corr:
+        datatemp = []
+        for n in arange(len(raw_data)):
+            if row_num == 0:
+                header = row_num
+            elif n_t + 1 <= row_num and row_num <= n_t + num_corr:
+                for n in arange(len(raw_data)):
+                    datatemp.append(raw_data[n])
+            if row_num == n_t + num_corr:
+                break
+            row_num += 1
+
+        ALSdata = array(datatemp)
+        num_columns = len(raw_data)
