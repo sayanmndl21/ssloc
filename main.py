@@ -77,15 +77,74 @@ for t in time_array:
 
     if t == t_i or n_hop>=num_corr:
         datatemp = []
-        for n in arange(len(raw_data)):
+        for row in raw_data:
             if row_num == 0:
                 header = row_num
             elif n_t + 1 <= row_num and row_num <= n_t + num_corr:
-                for n in arange(len(raw_data)):
-                    datatemp.append(raw_data[n])
+                for n in arange(len(row)):
+                    datatemp.append(row[n])
             if row_num == n_t + num_corr:
                 break
             row_num += 1
 
         ALSdata = array(datatemp)
-        num_columns = len(raw_data)
+        num_columns = len(row)
+
+        if len(ALSdata) == 0. or len(ALSdata) != num_corr*num_columns:
+            break
+
+        ALSdata.shape = num_corr,num_columns
+
+        ALS_data = zeros((num_corr,(mic_num+1)))
+
+        for n in arange(num_corr):
+            ALS_data[n,0] = n + int(t*f_s)
+            for m in arange(mic_num):
+                ALS_data[n,(m+1)] = ALSdata[n,m]
+    else:
+
+        del datatemp[0:int(n_hop*len(row))]
+
+        for row in raw_data:
+            if n_t + (num_corr - n_hop) <= row_num and row_num <= n_t + num_corr -1:
+                for n in arange(len(row)):
+                    datatemp.append(row[n])
+            if row_num == n_t + num_corr:
+                break
+            row_num += 1
+
+        ALSdata = array(datatemp)
+
+        ALSdata.shape = num_corr, num_columns
+
+        for n in ARANGE(num_corr):
+            ALS_data[n,0]=n+int(t*f_s)
+            for m in arange(mic_num):
+                ALS_data[n,(m+1)]=ALSdata[n,m]
+
+    ##setup done, now analyse
+
+    mic_correlation = zeros(num_mic_pairs,(2*num_corr - 1))
+
+    for k in arange(num_mic_pairs):
+
+        x = zeros(num_corr)
+        y1 = zeros(num_corr)
+        y2 = zeros(num_corr)
+
+        for p in arange(num_corr):
+            x[p] = ALS_data[p,0]
+            y1[p] = ALS_data[p,(first_mic_pair[k]+1)]
+            y1[p] = ALS_data[p,(second_mic_pair[k]+1)]#check this part
+
+        ycorr = scipy.correlate(y1,y2,mode = 'full')
+        xcorr = scipy.linspace(0,len(ycorr)-1, num = len(ycorr))
+
+        ycorr = ycorr/sqrt(np.mean(ycorr*ycorr))
+
+        ycorr_envelope = abs(scipy.signal.hilbert(ycorr)) #get hilbert envelope
+
+        ycorr_fft = scipy.fft(ycorr)
+        fft_max_period = len(ycorr_fft)/np.argmax(abs(ycorr_fft[0:len(ycorr_fft)/2]))
+
+        mic_pair_to_plot_corr = 7
