@@ -5,12 +5,12 @@ from params import *
 from vpython import *
 
 mic_num = 2
-num_mic_pairs = int(math.factorial(mic_n)/(math.factorial(mic_n-2)*2))
+num_mic_pairs = int(math.factorial(mic_num)/(math.factorial(mic_num-2)*2))
 
 #mic array coordinates
-mic_array_x = np.zeros(mic_n)
-mic_array_y = np.zeros(mic_n)
-mic_array_z = np.zeros(mic_n)
+mic_array_x = np.zeros(mic_num)
+mic_array_y = np.zeros(mic_num)
+mic_array_z = np.zeros(mic_num)
 
 mic_array_x[0] = -0.28 # update array setup to actual setup
 mic_array_x[1] = 0.28
