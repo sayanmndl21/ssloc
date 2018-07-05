@@ -3,6 +3,29 @@ import numpy as np
 from numpy import *
 from params import *
 from vpython import *
+from scipy import signal
+
+def gauss_kern(size, sizey=None):
+    """ Returns a normalized 2D gauss kernel array for convolutions """
+    # 3 x 3 array with sigma = sqrt (n/2)
+    size = int(size)
+    if not sizey:
+        sizey = size
+    else:
+        sizey = int(sizey)
+    x, y = np.mgrid[-size:size+1, -sizey:sizey+1]
+    g = np.exp(-(x**2/float(size) + y**2/float(sizey)))
+    return g / g.sum()
+
+def blur_image(im, n, ny=None) :
+    """ blurs the image by convolving with a gaussian kernel of typical
+        size n. The optional keyword argument ny allows for a different
+        size in the y direction.
+    """
+    g = gauss_kern(n, sizey=ny)
+    improc = signal.convolve(im, g, mode='valid')
+    return(improc)
+
 
 mic_num = 2
 num_mic_pairs = int(math.factorial(mic_num)/(math.factorial(mic_num-2)*2))
@@ -12,8 +35,8 @@ mic_array_x = np.zeros(mic_num)
 mic_array_y = np.zeros(mic_num)
 mic_array_z = np.zeros(mic_num)
 
-mic_array_x[0] = -0.28 # update array setup to actual setup
-mic_array_x[1] = 0.28
+mic_array_x[0] = -0.08 # update array setup to actual setup
+mic_array_x[1] = 0.08
 mic_array_y[0] = 0.05
 mic_array_y[1] = 0.04
 

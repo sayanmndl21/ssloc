@@ -8,7 +8,7 @@ class recorder():
     def __init__(self):
         self.RATE = 44100
         self.BUFFERSIZE = 3072 #ideal buffer for pi
-        self.sectorec = .05
+        self.sectorec = .1
         self.INITIAL_TAP_THRESHOLD = 200
         self.INITIAL_TAP_THRESHOLD1 = 200
         self.FORMAT = pyaudio.paInt16
@@ -36,7 +36,7 @@ class recorder():
                                  channels = 1,
                                  rate = self.RATE,
                                  input = True,
-                                 input_device_index = 7,
+                                 input_device_index = 4,
                                  frames_per_buffer = self.BUFFERSIZE)        
 
         return stream
@@ -46,7 +46,7 @@ class recorder():
                                  channels = 1,
                                  rate = self.RATE,
                                  input = True,
-                                 input_device_index = 8,
+                                 input_device_index = 5,
                                  frames_per_buffer = self.BUFFERSIZE)
 
         return stream1
@@ -62,7 +62,7 @@ class recorder():
         self.newAudio=True
         data = numpy.fromstring(audiostring,dtype=numpy.int16)
         data1 = numpy.fromstring(audiostring1,dtype=numpy.int16)
-        return data, data1
+        return numpy.concatenate([[data], [data1]])
 
     def recordsec(self, forever = True):
         """record in seconds"""

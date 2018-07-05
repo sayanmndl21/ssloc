@@ -27,8 +27,8 @@ if time_array_flag == 1:
     t_i = time_array[0]                               # set initial time here from array entries
     hop_size = f_s*(time_array[1] -time_array[0])   # redefine hop_size as # samples between each time in array
 else:
-    t_i= 15.213                     # *** starting time
-    t_f= 70.603                     # *** ending time
+    t_i= 0                     # *** starting time
+    t_f= 0.1                     # *** ending time
     t_f= t_f + hop_size
     time_array = numpy.arange(t_i,t_f,hop_size)
                                         # sets up the time to analyze array using the hop_size,start and stop times

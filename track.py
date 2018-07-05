@@ -292,7 +292,7 @@ for t in time_array:                                # loop over all times in inp
             print "trying to analyze a time beyond the file's end"
             break
 
-        ALSdata.shape = num_corr,num_columns            # reshape it into a 2D array of the right size
+        ALSdata.shape = 3072,num_columns            # reshape it into a 2D array of the right size
 
         ALS_data = zeros((num_corr,(mic_num+1)))        # initialize actual data array
         # our data array datatemp consists of strings of numbers;  each row holds "ch1","ch2","ch3","ch4"," "; where of course the first 4 entries are

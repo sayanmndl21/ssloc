@@ -28,7 +28,7 @@ import pylab
 sr = recorder()
 sr.setup()
 sr.continuerecord()
-raw_data, raw_data1 = sr.getAudio()
+raw_data = sr.getAudio()
 signal_level = round(abs(loudness(raw_data)))
 
 print(sr.getAudio(), flush = True)

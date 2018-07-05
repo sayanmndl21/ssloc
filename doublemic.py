@@ -51,7 +51,7 @@ class TapTester(object):
                                  channels = CHANNELS,
                                  rate = RATE,
                                  input = True,
-                                 input_device_index = 5,
+                                 input_device_index = 4,
                                  frames_per_buffer = INPUT_FRAMES_PER_BLOCK)        
 
         return stream
@@ -61,7 +61,7 @@ class TapTester(object):
                                  channels = CHANNELS,
                                  rate = RATE,
                                  input = True,
-                                 input_device_index = 6,
+                                 input_device_index = 5,
                                  frames_per_buffer = INPUT_FRAMES_PER_BLOCK)
 
         return stream1

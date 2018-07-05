@@ -4,8 +4,8 @@ import numpy as np
 
 sys.path.append("ssloc")
 
-import ssloc.localize as loc
-from ssloc.soundrecorder import record
+#import ssloc.localize as loc
+from ssloc.soundrecorder import recorder
 from ssloc.params import *
 from ssloc.micconfig import *
 import matplotlib.pyplot as plt
@@ -14,7 +14,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from numpy import *
 import scipy.optimize as opt
-import signal
+import signal, scipy
 from scipy import signal
 import unittest
 from pprint import pprint
@@ -27,9 +27,9 @@ unittests_log_dir = "data_log"
 unittests_file_pattern = "^test_[a-zA-Z0-9_]*.*$"
 
 cmd_dict = {
-    "sh": "bash"
+    "sh": "bash",
     "py": "python"
-}
+    }
 
 class TC:
     HEADER = '\033[95m'
@@ -52,24 +52,28 @@ ALS_write = open(ALS_name, 'w')
 
 #### start program #########
 
-sr = record()
+sr = recorder()
 sr.setup()
-sr.continuerecord()
+#sr.continuerecord()
 raw_data = sr.getAudio()
-signal_level = round(abs(loudness(raw_data)))
+rawdata = raw_data.reshape(3072,2)
+#signal_level = round(abs(loudness(raw_data)))
+num_corr = sr.BUFFERSIZE
 
 row_num = 0
 time_index = 0
 for t in time_array:
     if time_array_flag == 1:
-        if t! = t_i:
+        if t != t_i:
             hop_size = f_s*(t-t_last)
             t_last = t
         else:
             t_last = t
+    
+    start = time.time()
 
     n_t = int(f_s*t)
-    h_hop = int(f_s*hop_size)
+    n_hop = int(f_s*hop_size)
     corr_index_low = zeros(num_mic_pairs)
     corr_index_high = zeros(num_mic_pairs)
     prob_grid = zeros((grid_pts,grid_pts))
@@ -80,11 +84,8 @@ for t in time_array:
 
     if t == t_i or n_hop>=num_corr:
         datatemp = []
-        for row in raw_data:
-            if row_num == 0:
-                header = row_num
-            elif n_t + 1 <= row_num and row_num <= n_t + num_corr:
-                for n in arange(len(row)):
+        for row in rawdata:
+            for n in arange(len(row)):
                     datatemp.append(row[n])
             if row_num == n_t + num_corr:
                 break
@@ -120,14 +121,14 @@ for t in time_array:
 
         ALSdata.shape = num_corr, num_columns
 
-        for n in ARANGE(num_corr):
+        for n in arange(num_corr):
             ALS_data[n,0]=n+int(t*f_s)
             for m in arange(mic_num):
                 ALS_data[n,(m+1)]=ALSdata[n,m]
 
     ##setup done, now analyse
 
-    mic_correlation = zeros(num_mic_pairs,(2*num_corr - 1))
+    mic_correlation = zeros([num_mic_pairs,(2*num_corr - 1)])
 
     for k in arange(num_mic_pairs):
 
@@ -137,8 +138,8 @@ for t in time_array:
 
         for p in arange(num_corr):
             x[p] = ALS_data[p,0]
-            y1[p] = ALS_data[p,(first_mic_pair[k]+1)]
-            y1[p] = ALS_data[p,(second_mic_pair[k]+1)]#check this part
+            y1[p] = ALS_data[p,(int(first_mic_in_pair[k]+1))]
+            y2[p] = ALS_data[p,(int(second_mic_in_pair[k]+1))]#check this part
 
         ycorr = scipy.correlate(y1,y2,mode = 'full')
         xcorr = scipy.linspace(0,len(ycorr)-1, num = len(ycorr))
@@ -148,9 +149,9 @@ for t in time_array:
         ycorr_envelope = abs(scipy.signal.hilbert(ycorr)) #get hilbert envelope
 
         ycorr_fft = scipy.fft(ycorr)
-        fft_max_period = len(ycorr_fft)/np.argmax(abs(ycorr_fft[0:len(ycorr_fft)/2]))
+        fft_max_period = len(ycorr_fft)/np.argmax(abs(ycorr_fft[0:int(len(ycorr_fft)/2)]))
 
-        mic_pair_to_plot_corr = 7
+        mic_pair_to_plot_corr = 0
         if k == mic_pair_to_plot_corr:
             #vizualisedata
             pylab.subplot(311)
@@ -158,11 +159,11 @@ for t in time_array:
             pylab.plot(x,y2,'b.')
             #correlation data
             pylab.subplot(312)
-            pylab.plot((xcorr - (len(ycorr)/2)), fabs(ycorr), 'k.')
+            pylab.plot((xcorr - (len(ycorr)/2)), np.fabs(ycorr), 'k.')
             pylab.plot((xcorr - (len(ycorr)/2)), ycorr_envelope, 'g.')
             #fft data
             pylab.subplot(313)
-            pylab.plot(arange(0,len(ycorr_fft)/2,1),abs(ycorr_fft[0:len(ycorr_fft)/2]))
+            pylab.plot(arange(0,len(ycorr_fft)/2,1),abs(ycorr_fft[0:int(len(ycorr_fft)/2+1)]))
             pylab.show()
 
         for i in arange(len(ycorr)):
@@ -182,8 +183,8 @@ for t in time_array:
             for k in arange(num_mic_pairs):
                 p = bisect.bisect(xcorr, del_TOA_mic_pairs[k,n,m]) #search mic correlation matrix for correct distances
                 if corr_index_low[k] <= p and p <= corr_index_high[k]:
-                    for i in arange(p, corr_index_high[k],1):
-                        if fabs(xcorr[i] - del_TOA_mic_pairs[k,n,m])<=box_samples:
+                    for i in arange(p, int(corr_index_high[k]),1):
+                        if fabs(int(xcorr[i] - del_TOA_mic_pairs[k,n,m]))<=box_samples:
                             if add_flag == 0:
                                 if initialize_prob[n,m]:
                                     prob_grid[n,m] = 1.
@@ -204,9 +205,9 @@ for t in time_array:
                                 prob_grid[n,m] = prob_grid[n,m]+mic_correlation[k,i]#in db
                         else:
                             break
-    print("elapsed time to search grid="(time.time()-start),"s")
+    #print("elapsed time to search grid="(time.time()-start),"s")
     #done computing probabilities for this mic pair
-    if R_norm_flag == 1:
+    if rnorm_flag == 1:
         for n in arange(grid_pts):
             for m in arange(grid_pts):
                 delta_n = n - grid_pts/2
@@ -222,7 +223,7 @@ for t in time_array:
     ax = fig.add_subplot(211)
     prob_grid = scipy.transpose(prob_grid)
     if blur_image_flag == 1:
-        prob_grid = blur_image(prob_grid, gaussian_kernal)
+        prob_grid = blur_image(prob_grid, gaussian_kernel)
 
     prob_grid /= np.max(prob_grid)
     n_pts = len(prob_grid)
@@ -237,17 +238,17 @@ for t in time_array:
     pylab.title('pixel width = '+str(box_size)+' meter')
 
     #label mics
-    mic_x = array([mic_array_x[0]/box_size+n_pts/2,mic_array_x[1]/box_size+n_pts/2)
-    mic_y = array([mic_array_y[0]/box_size+n_pts/2,mic_array_y[1]/box_size+n_pts/2)
+    mic_x = array([mic_array_x[0]/box_size+n_pts/2,mic_array_x[1]/box_size+n_pts/2])
+    mic_y = array([mic_array_y[0]/box_size+n_pts/2,mic_array_y[1]/box_size+n_pts/2])
     pylab.plot(mic_x[:],mic_y[:],'r.')
     pylab.annotate("1", (mic_array_x[0]/box_size+n_pts/2,mic_array_y[0]/box_size+n_pts/2),fontsize=12,color='red')
     pylab.annotate("2", (mic_array_x[1]/box_size+n_pts/2,mic_array_y[1]/box_size+n_pts/2),fontsize=12,color='red')
 
     #view location
     plot_angle = ogrid[-pi:pi+0.05*pi:0.05*pi]
-    x = (3.89/box_size)*cos(plot_angle)+n_pts/2
-    y = (3.89/box_size)*sin(plot_angle)+n_pts/2
-    pylab.plot(x[:],y[:],color='white')
+    x = (3.89/box_size)*np.cos(plot_angle)+n_pts/2
+    y = (3.89/box_size)*np.sin(plot_angle)+n_pts/2
+    pylab.plot(x[:],y[:])
 
     block_size = int(n_pts/num_blocks)
     std_value = np.std(prob_grid)
@@ -258,8 +259,11 @@ for t in time_array:
     if plot_local_maxima == 1:
         for n in arange(0,n_pts, block_size):
             for m in arange(0, n_pts, block_size):
-                min_value = np.min(prob_grid[n:block_size,m:m+block_size])
-                max_value = np.max(prob_grid[n:block_size,m:m+block_size])
+                if len(prob_grid[n:block_size,m:m+block_size]) != 0: min_value = np.min(prob_grid[n:block_size,m:m+block_size])
+                else: min_value = 0
+                if len(prob_grid[n:block_size,m:m+block_size]) != 0: max_value = np.max(prob_grid[n:block_size,m:m+block_size])
+                else: max_value = 0
+                #max_value = np.max(prob_grid[n:block_size,m:m+block_size])
                 if fabs(max_value) > fabs(min_value) + num_stdev*std_value:
                     block_max = np.argmax(prob_grid[n:n+block_size,m:m+block_size])
                     n_plt = n + block_max/block_size
@@ -286,10 +290,10 @@ for t in time_array:
                     angle_lm_mean += angle_lm
                     lm_counter += 1
                     if beanforming != 1:
-                        ALS_write.write((str(t)+" "+str((m_plt-n_pts/2)*box_size)+" "+str((n_plt-n_pts/2)*box_size)+" "+str(max_value)+"\n") # save local maxima
-
-    ax.set_xlim(0,n_pts)
-    ax.set_ylim(0,n_pts)
+                        ALS_write.write((str(t)+" "+str((m_plt-n_pts/2)*box_size)+" "+str((n_plt-n_pts/2)*box_size)+" "+str(max_value)+"\n")) #save local maxima
+    
+    ax.set_xlim([0,n_pts])
+    ax.set_ylim([0,n_pts])
     ax.set_xticks(arange(0,n_pts,block_size))
     ax.set_yticks(arange(0,n_pts,block_size))
     pylab.savefig(ALS_file_corename[0]+"_"+str(time_index)+".png")
