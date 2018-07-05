@@ -8,7 +8,7 @@ class recorder():
     def __init__(self):
         self.RATE = 44100
         self.BUFFERSIZE = 3072 #ideal buffer for pi
-        self.sectorec = .1
+        self.sectorec = 10
         self.INITIAL_TAP_THRESHOLD = 200
         self.FORMAT = pyaudio.paInt16
         self.threadsdie = False
