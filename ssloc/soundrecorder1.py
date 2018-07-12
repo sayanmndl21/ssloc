@@ -40,7 +40,8 @@ class recorder():
 
 
     def close(self):
-        self.p.close(self.inStream)
+        self.inStream.close()
+        self.p.terminate()
 
     def getAudio(self):
         audiostring=self.inStream.read(self.BUFFERSIZE)
