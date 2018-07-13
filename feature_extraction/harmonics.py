@@ -117,6 +117,7 @@ def identify(result):
     quantl = []
     metrics = []
     psds = []
+    pfreq = []#uncomment when done 
     for each in selected:
         quant = (each[1]) * each[2]
         metric = each[1] + (each[2] - 5)*10 - 120
@@ -124,11 +125,13 @@ def identify(result):
         metrics.append(metric)
         quantl.append(quant)
         psds.append(each[1])
+        pfreq.append(each[0])
     newlist = np.multiply(metric,quantl)
     idx = f(newlist, 6)
     quantn = [quants[j] for j in idx]
     metricn = [metrics[j] for j in idx]
     psdn = [psds[j] for j in idx]
+    pfreq = [pfreq[j] for j in idx]
     if quants:
         strong = max(quants, key = op.itemgetter(2))
         metricc = strong[1]
@@ -138,7 +141,7 @@ def identify(result):
             boolian = False
     else:
         boolian = False       
-    return quantn, metricn, psdn, boolian
+    return quantn, metricn, psdn, pfreq, boolian
 
 ##double check for drone
 def detect(quants):
@@ -150,9 +153,10 @@ def detect(quants):
 
 def psddetectionresults(data):
     out = run(data)
-    q,m,p,b = identify(out)
+    q,m,p,pf,b = identify(out)
     p = np.array(p)
-    return p, b
+    pf = np.array(pf)
+    return p, pf, b
 
 def max_indices(arr, k):
     '''

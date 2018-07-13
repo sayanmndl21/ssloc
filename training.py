@@ -19,7 +19,7 @@ import csv
 
 pickle_flag = 0
 style.use("ggplot")
-metafile = 'output.csv'
+metafile = 'output.csv' #load dataset
 data = pd.read_csv(metafile)
 df = pd.DataFrame(data)
 #train_X = df.iloc[:-180, 10:].values

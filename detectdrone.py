@@ -78,7 +78,7 @@ while True:
     data, fs = record()
     ns = fil.bandpass_filter(data,bandpass)
     try:
-        p,b = hmn.psddetectionresults(data)
+        p,freq, b = hmn.psddetectionresults(data)
     except IndexError:
         pass
         b = False
@@ -88,11 +88,11 @@ while True:
         mfcc, chroma, mel, spect, tonnetz = fex.extract_feature(ns,fs)
         a,e,k = lpg.lpc(ns,10)
         mfcc_test = par.get_parsed_mfccdata(mfcc, chroma,mel,spect,tonnetz)
-        lpc_test = par.get_parsed_lpcdata(a,k,p)
+        lpc_test = par.get_parsed_lpcdata(a,k,freq)
         win.addstr(3,5,"Maybe a drone... Please Wait")
         x1 = clf.predict(mfcc_test)
-        x2 = clf1.predict(lpc_test)
-        win.addstr(5,5,"The drone is %s "% dist_prediction_label(x1[0]))
+        x2 = clf1.predict(lpc_test) 
+        win.addstr(5,5,"The drone is %s"% dist_prediction_label(x1[0]))
         win.addstr(6,5,"To be sure there is a %s "% drone_prediction_label(x2[0]))
         #sys.stdout.write("\r Maybe a drone... Please Wait \r \r \r \n \r")
         #sys.stdout.write('\r The drone is %s \r \r \n \r'% dist_prediction_label(x1[0]))
