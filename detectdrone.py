@@ -14,6 +14,7 @@ from feature_extraction import harmonics as hmn
 from feature_extraction import fextract as fex
 from feature_extraction import parsedata as par
 from feature_extraction.getconfi import logdata
+from feature_extraction.apicall import apicalls
 
 from sklearn import svm
 from sklearn.externals import joblib
@@ -74,6 +75,10 @@ def drone_prediction_label(value):
         label = "no drone"
     return label
 
+api_url = 'http://mlc67-cmp-00.egr.duke.edu/api/events'
+apikey = None
+send = apicalls(api_url,apikey)
+
 i = 0
 bandpass = [600,10000]
 while True:
@@ -115,6 +120,7 @@ while True:
     
     ##start calculating confidence of occurance
     output = log.get_result()
+    send.sendtoken(output)
     win.refresh()
     #tm.sleep(1)
     #os.system('cls' if os.name == 'nt' else 'clear')
@@ -122,5 +128,11 @@ while True:
     win.border()
 
 
-    
+
 print('iter_num:',i)
+
+import requests
+
+data = {"type":"Drone","distance":"Medium", "confidence":32,"location":"Drone Detector A","time":"3:08PM 04/05/2018"}
+
+response = requests.post('http://mlc67-cmp-00.egr.duke.edu/api/events', data=data)
