@@ -5,7 +5,7 @@ import librosa
 import sounddevice as sd
 import time as tm
 import scipy.io.wavfile as wavf
-import curses
+import curses, datetime
 
 from feature_extraction import filters as fil
 from feature_extraction import lpcgen as lpg
@@ -13,6 +13,7 @@ from feature_extraction import calcspectrum as csp
 from feature_extraction import harmonics as hmn
 from feature_extraction import fextract as fex
 from feature_extraction import parsedata as par
+from feature_extraction.getconfi import logdata
 
 from sklearn import svm
 from sklearn.externals import joblib
@@ -21,11 +22,12 @@ import pickle
 curses.initscr()
 
 clf = joblib.load('input/detection_iris_new.pkl')
-clf1 = joblib.load('input/detect_irisdrone_new.pkl')
+clf1 = joblib.load('input/dronedetectionfinal_new.pkl')
 
 rows = 10
 cols = 60
 winlist = []
+log = logdata(10)
 
 win = curses.newwin(rows,cols, 10, 3)
 win.clear()
@@ -66,9 +68,9 @@ def dist_prediction_label(value):
     return label
 
 def drone_prediction_label(value):
-    if value == 0:
+    if value == 1:
         label = "drone"
-    elif value == 1:
+    elif value == 0:
         label = "no drone"
     return label
 
@@ -98,6 +100,7 @@ while True:
         #sys.stdout.write('\r The drone is %s \r \r \n \r'% dist_prediction_label(x1[0]))
         #sys.stdout.write('\r To be sure there is a %s \r \r \n \r'% drone_prediction_label(x2[0]))
         #sys.stdout.flush()
+        log.insertdf(x1[0],str(datetime.datetime.now())[:-7])
     else:
         win.addstr(3,5,"Maybe a drone... Please Wait")
         win.addstr(5,5,"Need time to compute, but I think there is no drone")
@@ -109,6 +112,15 @@ while True:
         line = input()
         curses.endwin()
         break
+    
+    ##start calculating confidence of occurance
+    output = log.get_result()
     win.refresh()
+    #tm.sleep(1)
+    #os.system('cls' if os.name == 'nt' else 'clear')
+    win.clear()
+    win.border()
+
+
     
 print('iter_num:',i)

@@ -5,4 +5,4 @@ matplotlib
 six
 librosa
 scipy
-soundfiles
+soundfile
