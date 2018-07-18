@@ -28,7 +28,7 @@ clf1 = joblib.load('input/dronedetectionfinal_new.pkl')
 rows = 10
 cols = 60
 winlist = []
-log = logdata(10)
+log = logdata(5)
 
 win = curses.newwin(rows,cols, 10, 3)
 win.clear()
@@ -80,7 +80,7 @@ apikey = None
 push_url = "https://onesignal.com/api/v1/notifications"
 pushkey = None
 send = apicalls(api_url,apikey, push_url,pushkey)
-
+log.insertdf(3,str(datetime.datetime.now())[:-7]) #dummy value
 i = 0
 bandpass = [600,10000]
 while True:
@@ -113,13 +113,18 @@ while True:
         win.addstr(5,5,"Need time to compute, but I think there is no drone")
         #sys.stdout.write("\ n \r Need time to compute, but I think there is no drone \r \r \r \n")
         #sys.stdout.flush()
-    i+=1
+    
     
     if sys.stdin in select.select([sys.stdin],[],[],0)[0]:
         line = input()
         curses.endwin()
         break
-    
+    if log.dfempty():
+        output = log.get_result()
+        send.sendtoken(output)
+        if output['Label'] == "midrange" or output['Label'] == "very_near" or output['Label'] == "near":
+            send.push_notify()
+    i+=1
 
     win.refresh()
     #tm.sleep(1)
@@ -127,16 +132,8 @@ while True:
     win.clear()
     win.border()
     ##start calculating confidence of occurance
-    if log.dfempty():
-        output = log.get_result()
-        if i%10 == 0:
-            send.sendtoken(output)
+
 
 
 print('iter_num:',i)
 
-import requests
-
-data = {"type":"Drone","distance":"Medium", "confidence":32,"location":"Drone Detector A","time":"3:08PM 04/05/2018"}
-
-response = requests.post('http://mlc67-cmp-00.egr.duke.edu/api/events', data=data)

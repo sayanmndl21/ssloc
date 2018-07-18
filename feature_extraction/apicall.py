@@ -22,8 +22,6 @@ class apicalls(object):
         "time": self.timestamp
         }
         self.r =  requests.post(self.url, data = self.log)
-        if int(self.x) == 1 or int(self.x) == 2 or int(self.x) == 4:
-            self.push_notify()
         return self.r.text
         
     
