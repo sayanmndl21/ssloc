@@ -1,9 +1,12 @@
 import requests
+import json
  
 class apicalls(object):
-    def __init__(self, api_url, apikey):
+    def __init__(self, api_url, apikey, push_url, pushkey):
         self.url = api_url
         self.key = apikey
+        self.pushurl = push_url
+        self.pushKey = pushkey
 
     
     def sendtoken(self, record):
@@ -19,6 +22,8 @@ class apicalls(object):
         "time": self.timestamp
         }
         self.r =  requests.post(self.url, data = self.log)
+        if int(self.x) == 1 or int(self.x) == 2 or int(self.x) == 4:
+            self.push_notify()
         return self.r.text
         
     
@@ -34,6 +39,17 @@ class apicalls(object):
         elif x == 4:
             self.label = "very_near"
         return self.label
+    
+    def push_notify(self):
+        self.header = {"Content-Type": "application/json; charset=utf-8",
+        "Authorization": "Basic NDMyMTM5MjctMzYxZC00OTM3LTkxODEtYjljNDY5OTdmNGE0"}
+        self.payload = {"app_id": "2ebe188c-34d4-423f-8c7f-21bd0483fc95",
+        "contents": {"en": "Drone Detected!!"},
+	    "template_id": "658d2118-ea02-4902-88e0-b708fa2e4fcd",
+        "included_segments": ["All"]}
+        self.req = requests.post(self.pushurl,headers = self.header,data = json.dumps(self.payload))
+        return self.req.text
+
     
 #    def getConfidence(self,y):
 #        if y < 50:

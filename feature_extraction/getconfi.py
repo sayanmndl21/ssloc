@@ -19,6 +19,7 @@ class logdata:
             'Occurance': occurance, 
             'Confidence': confidence
         }), ignore_index=True)
+        
 
         self.df.sort_index(inplace=True, ascending=False)
         self.del_row()
@@ -32,6 +33,9 @@ class logdata:
             self.df['Confidence'] = self.df.Label.apply(lambda x: confidence[x])
 
         return self.df
+    
+    def dfempty(self):
+        return self.df.empty
 
     def get_occurance(self):
         # group by label and count
@@ -39,7 +43,7 @@ class logdata:
         return occ
 
     def get_confidence(self, occurance):
-        conf = ((occurance / sum(occurance)).rename('Confidence') * 100).astype(int)
+        conf = ((occurance / sum(occurance)).rename('Confidence') * 100).astype('float64')
         return conf
 
     def del_row(self):

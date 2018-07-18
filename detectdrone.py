@@ -77,7 +77,9 @@ def drone_prediction_label(value):
 
 api_url = 'http://mlc67-cmp-00.egr.duke.edu/api/events'
 apikey = None
-send = apicalls(api_url,apikey)
+push_url = "https://onesignal.com/api/v1/notifications"
+pushkey = None
+send = apicalls(api_url,apikey, push_url,pushkey)
 
 i = 0
 bandpass = [600,10000]
@@ -118,15 +120,17 @@ while True:
         curses.endwin()
         break
     
-    ##start calculating confidence of occurance
-    output = log.get_result()
-    send.sendtoken(output)
+
     win.refresh()
     #tm.sleep(1)
     #os.system('cls' if os.name == 'nt' else 'clear')
     win.clear()
     win.border()
-
+    ##start calculating confidence of occurance
+    if log.dfempty():
+        output = log.get_result()
+        if i%10 == 0:
+            send.sendtoken(output)
 
 
 print('iter_num:',i)
