@@ -20,7 +20,7 @@ from sklearn import svm
 from sklearn.externals import joblib
 import pickle
 
-curses.initscr()
+#curses.initscr()
 
 clf = joblib.load('input/detection_iris_new.pkl')
 clf1 = joblib.load('input/dronedetectionfinal_new.pkl')
@@ -30,10 +30,10 @@ cols = 60
 winlist = []
 log = logdata(5)
 
-win = curses.newwin(rows,cols, 10, 3)
-win.clear()
-win.border()
-winlist.append(win)
+#win = curses.newwin(rows,cols, 10, 3)
+#win.clear()
+#win.border()
+#winlist.append(win)
 
 def record(time = 1, fs = 44100):
     #os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'feature_extraction'))
@@ -98,39 +98,43 @@ while True:
         a,e,k = lpg.lpc(ns,10)
         mfcc_test = par.get_parsed_mfccdata(mfcc, chroma,mel,spect,tonnetz)
         lpc_test = par.get_parsed_lpcdata(a,k,freq)
-        win.addstr(3,5,"Maybe a drone... Please Wait")
+        #win.addstr(3,5,"Maybe a drone... Please Wait")
         x1 = clf.predict(mfcc_test)
         x2 = clf1.predict(lpc_test) 
-        win.addstr(5,5,"The drone is %s"% dist_prediction_label(x1[0]))
-        win.addstr(6,5,"To be sure there is a %s "% drone_prediction_label(x2[0]))
+        #win.addstr(5,5,"The drone is %s"% dist_prediction_label(x1[0]))
+        #win.addstr(6,5,"To be sure there is a %s "% drone_prediction_label(x2[0]))
         #sys.stdout.write("\r Maybe a drone... Please Wait \r \r \r \n \r")
         #sys.stdout.write('\r The drone is %s \r \r \n \r'% dist_prediction_label(x1[0]))
         #sys.stdout.write('\r To be sure there is a %s \r \r \n \r'% drone_prediction_label(x2[0]))
         #sys.stdout.flush()
+        print("Drone at %s"% dist_prediction_label(x1[0]))
         log.insertdf(x1[0],str(datetime.datetime.now())[:-7])
+        output = log.get_result()
+            #win.addstr(7,5,"Recieved a Result!")
+        send.sendtoken(output)
+        if output['Label'] == 4:
+            send.push_notify()
+            #win.addstr(8,5,"Data Sent!")
     else:
-        win.addstr(3,5,"Maybe a drone... Please Wait")
-        win.addstr(5,5,"Need time to compute, but I think there is no drone")
+        #win.addstr(3,5,"Maybe a drone... Please Wait")
+        #win.addstr(5,5,"Need time to compute, but I think there is no drone")
         #sys.stdout.write("\ n \r Need time to compute, but I think there is no drone \r \r \r \n")
         #sys.stdout.flush()
+        print("Wait for result")
     
     
-    if sys.stdin in select.select([sys.stdin],[],[],0)[0]:
-        line = input()
-        curses.endwin()
-        break
-    if log.dfempty():
-        output = log.get_result()
-        send.sendtoken(output)
-        if output['Label'] == "midrange" or output['Label'] == "very_near" or output['Label'] == "near":
-            send.push_notify()
+#    if sys.stdin in select.select([sys.stdin],[],[],0)[0]:
+#        line = input()
+#        curses.endwin()
+#        break
+
     i+=1
 
-    win.refresh()
+    #win.refresh()
     #tm.sleep(1)
     #os.system('cls' if os.name == 'nt' else 'clear')
-    win.clear()
-    win.border()
+    #win.clear()
+    #win.border()
     ##start calculating confidence of occurance
 
 
