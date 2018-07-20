@@ -7,17 +7,23 @@ class logdata:
         self.df = pd.DataFrame(data = None, 
                                columns = ['Timestamp','Label','Occurance', 'Confidence'],
                               )
+        self.df1 = pd.DataFrame(data = None, 
+                               columns = ['Timestamp','Actuallabel','Labelpredicted_S','Labelpredicted_R'],
+                              )
+        
 
     def insertdf(self, x, timestamp):
+        self.x = x
+        self.times = timestamp
         # default values
-        occurance = 1
-        confidence = 100
+        self.occurance = 1
+        self.confidence = 100
 
         self.df = self.df.append(pd.Series({
-            'Timestamp': timestamp, 
-            'Label': x, 
-            'Occurance': occurance, 
-            'Confidence': confidence
+            'Timestamp': self.times, 
+            'Label': self.x, 
+            'Occurance': self.occurance, 
+            'Confidence': self.confidence
         }), ignore_index=True)
         
 
@@ -26,14 +32,37 @@ class logdata:
 
         # Calculate the confidence and occurances of labels
         if self.df.shape[0] > 1:
-            occurance = self.get_occurance()
-            confidence = self.get_confidence(occurance)
+            self.occurance = self.get_occurance()
+            self.confidence = self.get_confidence(self.occurance)
 
-            self.df['Occurance'] = self.df.Label.apply(lambda x: occurance[x])
-            self.df['Confidence'] = self.df.Label.apply(lambda x: confidence[x])
+            self.df['Occurance'] = self.df.Label.apply(lambda x: self.occurance[x])
+            self.df['Confidence'] = self.df.Label.apply(lambda x: self.confidence[x])
 
+
+        
         return self.df
+
     
+    def logdf(self, user_x, x1,x2, file,i):
+        
+        self.df1 = self.df1.append(pd.Series({
+            'Timestamp': self.times,
+            'Actuallabel':user_x,
+            'Labelpredicted_S': x1, 
+            'Labelpredicted_R': x2, 
+        }), ignore_index=True)
+        
+
+        self.df1.sort_index(inplace=True, ascending=False)
+        if self.df.shape[0] > int(i):
+            self.df1.to_csv(file+".csv", sep='\t', encoding='utf-8')
+        #iter+= 1
+
+        return self.df1     
+
+        
+
+
     def dfempty(self):
         return self.df.empty
 
