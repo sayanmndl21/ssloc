@@ -16,9 +16,9 @@ def readaudio(file):
 
 bandpass = [600, 10000]
 nfile_flag = 2
-fnid = 909000
+fnid = 210000
 for root, dirs, files in os.walk(sys.argv[1]):
-    with open(root+'out.csv', 'w',newline='') as f:
+    with open(root+'_log.csv', 'w',newline='') as f:
         fieldnames = ['ID','Height','Distance','MFCC','CHROMA','MELSPECTROGRAM','SPECTRALCONTRAST','TONNETZ']
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writeheader()
@@ -59,8 +59,8 @@ for root, dirs, files in os.walk(sys.argv[1]):
                         fnid+=1
                 
                 elif nfile_flag == 2:
-                    Height1=int(stri[:2])
-                    Distance1=int(stri[3:5])
+                    Height1=sys.argv[2]
+                    Distance1=sys.argv[3]
                     if True:#not np.isnan(a[1]):
                         thewriter.writerow({'ID':stri,'Height':Height1,'Distance':Distance1,'MFCC':mfccs,'CHROMA':chroma,'MELSPECTROGRAM':mel,'SPECTRALCONTRAST':contrast,'TONNETZ':tonnetz})
                         fnid+=1

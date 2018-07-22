@@ -19,7 +19,7 @@ import csv
 
 pickle_flag = 0
 style.use("ggplot")
-metafile = 'output.csv' #load dataset
+metafile = 'tenis.csv' #load dataset
 data = pd.read_csv(metafile)
 df = pd.DataFrame(data)
 #train_X = df.iloc[:-180, 10:].values
@@ -39,8 +39,8 @@ with open(metafile, 'r',newline='') as f:
     rlpcl= []
     psdl =[]
     for row in reader:
-        fileid = float(row['ID'])
-        if fileid > 9000000:
+        #fileid = float(row['ID'])
+        if True:#fileid > 9000000:
             mfcc = [float(t) for t in row['MFCC'].strip("[]").split()]
             chroma = [float(t) for t in row['CHROMA'].strip("[]").split()]
             mel = [float(t) for t in row['MELSPECTROGRAM'].strip("[]").split()]
@@ -49,8 +49,8 @@ with open(metafile, 'r',newline='') as f:
             #lpc = [float(t) for t in row['LPCCOEFF'].strip("[]").split()]
             #rlpc = [float(t) for t in row['RCOEFF'].strip("[]").split()]
             #psd = [float(t) for t in row['PSD'].strip("[,]").split(",")]
-            h = [float(t[:-1]) for t in row['Height'].strip("[]").split()]
-            d = [float(t[:-1]) for t in row['Distance'].strip("[]").split()]
+            h = [float(t) for t in row['Height'].strip("[]").split()]
+            d = [float(t) for t in row['Distance'].strip("[]").split()]
             coord = np.array([h, d])
             v=np.linalg.norm(coord-np.array([0,0]))
         if v<=15:

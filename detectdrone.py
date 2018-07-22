@@ -83,7 +83,7 @@ def drone_prediction_label(value):
     return label
 
 """remove mkdir once done"""
-os.mkdir(dist_prediction_label(sys.argv[1]))
+#os.mkdir(dist_prediction_label(sys.argv[1]))
 ###############################################################################################
 
 
@@ -113,7 +113,7 @@ while True:
         #win.addstr(3,5,"Maybe a drone... Please Wait")
         x01 = clf.predict(mfcc_test)
         x02 = clm.predict(mfcc_test)
-        x1 = ((x02[0]+x02[0])/2)
+        x1 = ((x01[0]+x01[0])/2)
         #x2 = clf1.predict(lpc_test) 
         #win.addstr(5,5,"The drone is %s"% dist_prediction_label(x1[0]))
         #win.addstr(6,5,"To be sure there is a %s "% drone_prediction_label(x2[0]))
@@ -126,18 +126,19 @@ while True:
         print(x1)
         output = log.get_result()
         '''-----------uncomment if you want to save logs-----------------'''
-        log.logdf(sys.argv[1],x01[0],x02[0],sys.argv[2],sys.argv[3])
+        log.logdf(sys.argv[1],x01[0],x02[0],str(datetime.datetime.now())[:-7])
         '''---------------------------------------------------------------'''
-        if i > 9:
-            print(int(output['Label']))
+        #if i > 9:
+        #    print(int(output['Label']))
             #win.addstr(7,5,"Recieved a Result!")
-            send.sendtoken(output)
-            if int(output['Label']) != int(3) and int(output['Label']) != int(0):
-                send.push_notify()
-                print("sent %s"% int(output['Label']))
+        #    send.sendtoken(output)
+        #    if int(output['Label']) != int(3) and int(output['Label']) != int(0):
+        #        send.push_notify()
+        #        print("sent %s"% int(output['Label']))
                 #win.addstr(8,5,"Data Sent!")
         ######################################################################################################
         if itervalue > int(sys.argv[3]):
+            log.savedf(sys.argv[2])
             exit()
         itervalue+=1
     else:

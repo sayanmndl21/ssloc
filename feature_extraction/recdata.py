@@ -29,6 +29,6 @@ def record(time = 1, fs = 44100):
 
 def readaudio(file):
     data, fs = librosa.load(file)
-    os.remove(file)
+    #os.remove(file)
     return data, fs
 
