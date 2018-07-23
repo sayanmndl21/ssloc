@@ -19,7 +19,7 @@ import csv
 
 pickle_flag = 0
 style.use("ggplot")
-metafile = 'tenis.csv' #load dataset
+metafile = 'tenis_1.csv' #load dataset
 data = pd.read_csv(metafile)
 df = pd.DataFrame(data)
 #train_X = df.iloc[:-180, 10:].values
@@ -49,9 +49,14 @@ with open(metafile, 'r',newline='') as f:
             #lpc = [float(t) for t in row['LPCCOEFF'].strip("[]").split()]
             #rlpc = [float(t) for t in row['RCOEFF'].strip("[]").split()]
             #psd = [float(t) for t in row['PSD'].strip("[,]").split(",")]
-            h = [float(t) for t in row['Height'].strip("[]").split()]
-            d = [float(t) for t in row['Distance'].strip("[]").split()]
-            coord = np.array([h, d])
+            h = [(t) for t in row['Height'].strip("[]").split()]
+            d = [(t) for t in row['Distance'].strip("[]").split()]
+            if str(h[0].strip("[]"))[-1:] == "m" and str(d[0].strip("[]"))[-1:] == "m":
+                h = str(h[0].strip("[]"))[:-1]
+                d = str(d[0].strip("[]"))[:-1]
+                coord = np.array([float(h), float(d)])
+            else:
+                coord = np.array([float(h[0]), float(d[0])])
             v=np.linalg.norm(coord-np.array([0,0]))
         if v<=15:
             label="vnear"
@@ -71,27 +76,30 @@ with open(metafile, 'r',newline='') as f:
         elif v > 150:
             label1 ="drone"
             label = "vfar"
+        elif h[0] == "nan":
+            label = "no_drone"
         features = np.empty((0,193))
         #fpfeatures = np.empty((0,26))
         ext_features = np.hstack([mfcc,chroma,mel,spect,tonnetz])
         #fpext_features = np.hstack([lpc,rlpc,psd])
         features = np.vstack([features,ext_features])
-        fpfeatures = np.vstack([fpfeatures,fpext_features])
+        #fpfeatures = np.vstack([fpfeatures,fpext_features])
         i+=1
-        if not np.isnan(lpc[0]):
+        if True:#not np.isnan(lpc[0]):
             mfccl.append(mfcc)
             chromal.append(chroma)
             mell.append(mel)
             spectl.append(spect)
             tonnetzl.append(tonnetz)
-            lpcl.append(lpc)
-            psdl.append(psd)
-            rlpcl.append(rlpc)
+            #lpcl.append(lpc)
+            #psdl.append(psd)
+            #rlpcl.append(rlpc)
             mfcc_data.append([features, features.shape, label])
-            lpc_data.append([fpfeatures, fpfeatures.shape, label1])
+            #lpc_data.append([fpfeatures, fpfeatures.shape, label1])
 cols=["features", "shape","label"]
 mfcc_pd = pd.DataFrame(data = mfcc_data, columns=cols)
-lpc_pd = pd.DataFrame(data = lpc_data, columns=cols)
+mfcc_pd.sample(frac=1).reset_index(drop=True)
+#lpc_pd = pd.DataFrame(data = lpc_data, columns=cols)
 
 
 le = LabelEncoder()
