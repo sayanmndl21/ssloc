@@ -16,10 +16,11 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.externals import joblib
 import pickle, scipy
 import csv
+from sklearn.utils import shuffle
 
 pickle_flag = 0
 style.use("ggplot")
-metafile = 'tenis_1.csv' #load dataset
+metafile = 'tenis.csv' #load dataset
 data = pd.read_csv(metafile)
 df = pd.DataFrame(data)
 #train_X = df.iloc[:-180, 10:].values
@@ -190,7 +191,7 @@ print(type(lpc_train_data))
 
 """----------------------------------------------------------------------------"""
 def confusion(true, predicted):
-    matrix = np.zeros([5,5])
+    matrix = np.zeros([6,6])
     #d = 0
     for t, p in zip(true, predicted):
         matrix[t,p] += 1.5

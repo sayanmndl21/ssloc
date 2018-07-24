@@ -24,8 +24,9 @@ import pickle
 
 
 
-clf = joblib.load('input/detection_iris_new.pkl')
-clm = joblib.load('input/detection_new18july.pkl')
+#clf = joblib.load('input/detection_iris_new.pkl')
+clf = joblib.load('input/detection_new10secdata.pkl')
+clm = joblib.load('input/detection_attennisfield.pkl')
 clf1 = joblib.load('input/dronedetectionfinal_new.pkl')
 
 rows = 10
@@ -107,7 +108,7 @@ while True:
     
     if b:
         mfcc, chroma, mel, spect, tonnetz = fex.extract_feature(ns,fs)
-        a,e,k = lpg.lpc(ns,10)
+        #a,e,k = lpg.lpc(ns,10)
         mfcc_test = par.get_parsed_mfccdata(mfcc, chroma,mel,spect,tonnetz)
         #lpc_test = par.get_parsed_lpcdata(a,k,freq)
         #win.addstr(3,5,"Maybe a drone... Please Wait")
