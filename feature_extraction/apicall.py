@@ -23,6 +23,21 @@ class apicalls(object):
         }
         self.r =  requests.post(self.url, data = self.log)
         return self.r.text
+    
+    def sendtoken1(self, record):
+        self.x = record['Label']
+        self.Label1 = self.getLabel1(int(self.x))
+        self.timestamp =record['Timestamp']
+        self.confidence = record['Confidence']
+        #self.confidenceLabel = self.getConfidence(int(self.confidence))
+        self.log = {"type": "Drone",
+        "distance" : self.Label1,
+        "confidence": self.confidence,
+        "location": "Drone Detector A",
+        "time": self.timestamp
+        }
+        self.r =  requests.post(self.url, data = self.log)
+        return self.r.text
         
     
     def getLabel(self,x):
@@ -35,6 +50,19 @@ class apicalls(object):
         elif x == 3:
             self.label = "very_far"
         elif x == 4:
+            self.label = "very_near"
+        return self.label
+
+    def getLabel1(self,x):
+        if x == 0:
+            self.label = "far"
+        elif x == 1:
+            self.label = "midrange"
+        elif x == 2:
+            self.label = "near"
+        elif x == 3 or x == 4:
+            self.label = "very_far"
+        elif x == 5:
             self.label = "very_near"
         return self.label
     

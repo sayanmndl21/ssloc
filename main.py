@@ -125,11 +125,12 @@ try:#don't want user warnings
                 dt = tm.time() - prev_time
                 if dt > 30:#send output every 30secs
                     #print('10sec elapsed')
-                    send.sendtoken(output)
-                    prev_time = tm.time()
-                if int(output['Label']) != int(3) and int(output['Label']) != int(0):
-                    send.push_notify()
+                    send.sendtoken1(output)
                     print("sent %s"% int(output['Label']))
+                    prev_time = tm.time()
+                    if int(output['Label']) == int(2) or int(output['Label']) == int(5):
+                        send.push_notify()
+                        print("pushed %s"% int(output['Label']))
                     #win.addstr(8,5,"Data Sent!")
             ######################################################################################################
             # if itervalue > int(sys.argv[3]):
