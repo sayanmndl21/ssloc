@@ -16,6 +16,7 @@ from feature_extraction import fextract as fex
 from feature_extraction import parsedata as par
 from feature_extraction.getconfi import logdata
 from feature_extraction.apicall import apicalls
+from feature_extraction.specsub import reduce_noise
 
 from sklearn import svm
 from sklearn.externals import joblib
@@ -23,7 +24,7 @@ import pickle
 
 warnings.filterwarnings("ignore")
 """clf = joblib.load('input/detection_iris_new.pkl')## this is the vnear robust one"""
-clf = joblib.load('input/detection_backyaard.pkl')## this is taken at the beach
+clf = joblib.load('input/detection_backyaardwithnoise.pkl')## this is taken at the beach
 #clm = joblib.load('input/detection_new18july.pkl')
 #clf1 = joblib.load('input/dronedetectionfinal_new.pkl')
 
@@ -71,6 +72,7 @@ def dist_prediction_label(value):
         label = "vnear"
     return label
 
+noise, sfr = record()
 
 # def drone_prediction_label(value):
 #     if value == 1:
@@ -95,6 +97,7 @@ prev_time= tm.time()#initiate time
 try:#don't want user warnings
     while True:
         data, fs = record()
+        out = reduce_noise(data,noise)
         ns = fil.bandpass_filter(data,bandpass)
         try:
             p,freq, b = hmn.psddetectionresults(data)
