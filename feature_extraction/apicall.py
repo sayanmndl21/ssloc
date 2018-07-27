@@ -39,7 +39,7 @@ class apicalls(object):
         self.r =  requests.post(self.url, data = self.log)
         return self.r.text
     
-    def sendtoken1(self, record):
+    def sendtoken2(self, record):
         self.x = record['Label']
         self.Label2 = self.getLabel2(int(self.x))
         self.timestamp =record['Timestamp']
@@ -81,7 +81,7 @@ class apicalls(object):
             self.label = "very_near"
         return self.label
 
-        def getLabel2(self,x):
+    def getLabel2(self,x):
         if x == 0:
             self.label = "far"
         elif x == 1:

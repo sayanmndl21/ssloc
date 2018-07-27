@@ -96,7 +96,7 @@ try:#don't want user warnings
     while True:
         data, fs = record()
         ns = data
-        #ns = fil.bandpass_filter(data,bandpass)
+        #cdns = fil.bandpass_filter(data,bandpass)
         try:
             p,freq, b = hmn.psddetectionresults(data)
         except IndexError:

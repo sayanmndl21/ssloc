@@ -119,16 +119,16 @@ try:#don't want user warnings
             '''-----------uncomment if you want to save logs-----------------'''
             #log.logdf(sys.argv[1],x01[0],x02[0],str(datetime.datetime.now())[:-7])
             '''---------------------------------------------------------------'''
-            if True:#i > 9:
+            if i > 9:
                 print(int(output['Label']))
                 #win.addstr(7,5,"Recieved a Result!")
                 dt = tm.time() - prev_time
                 if dt > 30:#send output every 30secs
                     print('sent %s'% int(output['Label']))
-                    #send.sendtoken2(output)
+                    send.sendtoken2(output)
                     prev_time = tm.time()
                     if int(output['Label']) == int(4) or int(output['Label']) == int(2):
-                        #send.push_notify()
+                        send.push_notify()
                         print("pushed %s"% int(output['Label']))
                     #win.addstr(8,5,"Data Sent!")
             ######################################################################################################
