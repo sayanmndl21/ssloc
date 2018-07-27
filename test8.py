@@ -130,7 +130,7 @@ try:#don't want user warnings
                     print('sent %s'% int(output['Label']))
                     send.sendtoken2(output)
                     prev_time = tm.time()
-                    if int(output['Label']) == int(4) or int(output['Label']) == int(2):
+                    if int(output['Label']) == int(3) or int(output['Label']) == int(2):
                         send.push_notify()
                         print("pushed %s"% int(output['Label']))
                     #win.addstr(8,5,"Data Sent!")

@@ -80,7 +80,7 @@ def reduce_noise(signal, noisy_signal, winsize=2**10, window=sp.hanning(2**10)):
     method = SpectralSubtraction(winsize, window, coefficient=5.0, ratio=1.0)
 
     out = sp.zeros(len(signal), sp.float32)
-    power = sig.welch(noisy_signal, window=window, return_onesided=False, scaling='spectrum')[1] * window.sum()**2
+    power = sig.welch(noisy_signal, window=window, nperseg=1024, return_onesided=False, scaling='spectrum')[1] * window.sum()**2
     nf = len(signal)/(winsize/2) - 1
     for no in range(int(nf)):
         s = get_frame(signal, winsize, no)
